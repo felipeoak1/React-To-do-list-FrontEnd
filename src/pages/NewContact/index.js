@@ -8,7 +8,7 @@ export default function Home() {
   return (
     <>
       <PageHeader title="Novo Contato" />
-      <ContactForm />
+      <ContactForm buttonLabel="Cadastrar" />
     </>
   );
 }

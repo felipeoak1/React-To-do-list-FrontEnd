@@ -6,7 +6,6 @@ import { Container } from "./styles";
 
 import Routes from "../../Routes";
 import Header from "../Header";
-import ContactsList from "../ContactsList";
 
 function App() {
   return (

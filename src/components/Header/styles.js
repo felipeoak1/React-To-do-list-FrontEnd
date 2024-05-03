@@ -22,7 +22,7 @@ export const InputSearchContainer = styled.div`
     box-shadow: 0px 4px 18px rgba(0, 0, 0, 0.04);
 
     &::placeholder{
-      color: #BCBCBC
+      color: ${({ theme }) => theme.colors.gray[200]}
     }
   }
 `;

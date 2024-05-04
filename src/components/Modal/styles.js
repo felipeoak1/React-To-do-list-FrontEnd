@@ -23,6 +23,7 @@ export const Container = styled.div`
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.04);
 
   h1 {
+    color: ${({ theme, danger }) => (danger ? theme.colors.danger.main : theme.colors.danger.dark)};
     font-size: 22px;
   }
 

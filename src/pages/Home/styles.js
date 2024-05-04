@@ -6,7 +6,7 @@ export const Container = styled.div`
 
 export const InputSearchContainer = styled.div`
   width: 100%;
-  
+
   input {
     width: 100%;
     height: 50px;

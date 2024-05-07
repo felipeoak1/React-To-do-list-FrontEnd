@@ -5,7 +5,7 @@ export default function FormGroup({ children, error }) {
   return (
     <Container>
       {children}
-      {error && <small>{error}</small>}
+      {error ? <small>{error}</small> : false}
     </Container>
   );
 }

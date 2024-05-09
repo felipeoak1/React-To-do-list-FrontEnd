@@ -12,6 +12,7 @@ export default styled.input`
   padding: 0 16px;
   font-size: 16px;
   transition: border 0.1s ease-in;
+  appearance: none;
 
   &:focus {
     border: 2px solid ${({ theme }) => theme.colors.primary.main};

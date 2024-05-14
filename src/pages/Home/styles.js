@@ -58,14 +58,18 @@ export const ListHeader = styled.header`
       border: none;
       display: flex;
       align-items: center;
-    }
 
-    span  {
-      margin-right: 8px;
-      font-weight: bold;
-      color: ${({ theme }) => theme.colors.primary.main}
-    }
+      span  {
+        margin-right: 8px;
+        font-weight: bold;
+        color: ${({ theme }) => theme.colors.primary.main}
+      }
 
+      img {
+        transform: ${({ orderBy }) => (orderBy === "ASC" ? "rotate(180deg)" : "rotate(0deg)")};
+        transition: transform 0.2s ease-in;
+      }
+    }
 `;
 
 export const Card = styled.div`

@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom/cjs/react-router-dom.min";
 import { useEffect, useState, useMemo } from "react";
+import ContactsService from "../../services/ContactsService";
 
 import formatPhone from "../../utils/formatPhone";
 import {
@@ -22,16 +23,23 @@ export default function Home() {
     contact.name.toLowerCase().includes(searchTerm.toLowerCase())
   )), [contacts, searchTerm]);
 
+  // useEffect não pode ser configurado como assíncrono. Race condition.
   useEffect(() => {
-    setIsLoading(true);
-
-    fetch(`http://localhost:3001/contacts?orderBy=${orderBy}`)
-      .then(async (response) => {
-        const resposta = await response.json();
-        setContacts(resposta);
+    async function loadContacts() {
+      setIsLoading(true);
+      try {
+        const contactsList = await ContactsService.listContacts(orderBy);
+        setContacts(contactsList);
+      } catch (error) {
+        console.log("error", error);
+      } finally {
         setIsLoading(false);
-      })
-      .catch((erro) => console.log(erro));
+      }
+    }
+
+    loadContacts();
+
+    return () => console.log("Clean Up");
   }, [orderBy]);
 
   function handleToggleOrderBy() {
@@ -47,7 +55,7 @@ export default function Home() {
   return (
     <Container>
 
-      {isLoading && <Loader />}
+      <Loader isLoading={isLoading} />
 
       <InputSearchContainer>
         <input

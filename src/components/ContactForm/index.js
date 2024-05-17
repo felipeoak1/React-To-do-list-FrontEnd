@@ -25,19 +25,19 @@ export default function ContactForm({ buttonLabel }) {
 
   const isFormValid = (nome && errors.length === 0);
 
-  function handlePhoneChange(event) {
+  const handlePhoneChange = useCallback((event) => {
     setTelefone(formatPhone(event.target.value));
-  }
+  }, [setTelefone]);
 
-  function handleSubmit(event) {
+  const handleSubmit = useCallback((event) => {
     event.preventDefault();
 
     console.log({
       nome, email, telefone: telefone.replace(/\D/g, ""), categoria,
     });
-  }
+  }, [nome, email, telefone, categoria]);
 
-  function handleNameChange(event) {
+  const handleNameChange = useCallback((event) => {
     setNome(event.target.value);
 
     if (!event.target.value) {
@@ -45,9 +45,9 @@ export default function ContactForm({ buttonLabel }) {
     } else {
       removeError("nome");
     }
-  }
+  }, [setError, removeError]);
 
-  function handleEmailChange(event) {
+  const handleEmailChange = useCallback((event) => {
     setEmail(event.target.value);
 
     if (event.target.value && !isEmailValid(event.target.value)) {
@@ -55,26 +55,26 @@ export default function ContactForm({ buttonLabel }) {
     } else {
       removeError("email");
     }
-  }
+  }, [setEmail, setError, removeError]);
 
   return (
-    <Form onSubmit={useCallback(handleSubmit)} noValidate>
-      <FormGroup error={useCallback(getErrorMessageByFieldName("nome"))}>
+    <Form onSubmit={handleSubmit} noValidate>
+      <FormGroup error={getErrorMessageByFieldName("nome")}>
         <Input
-          error={useCallback(getErrorMessageByFieldName("nome"))}
+          error={getErrorMessageByFieldName("nome")}
           placeholder="Nome *"
           value={nome}
-          onChange={useCallback(handleNameChange)}
+          onChange={handleNameChange}
         />
       </FormGroup>
 
-      <FormGroup error={useCallback(getErrorMessageByFieldName("email"))}>
+      <FormGroup error={getErrorMessageByFieldName("email")}>
         <Input
           type="email"
-          error={useCallback(getErrorMessageByFieldName("email"))}
+          error={getErrorMessageByFieldName("email")}
           placeholder="E-mail"
           value={email}
-          onChange={useCallback(handleEmailChange)}
+          onChange={handleEmailChange}
         />
       </FormGroup>
 
@@ -83,7 +83,7 @@ export default function ContactForm({ buttonLabel }) {
           maxLength="15"
           placeholder="Telefone"
           value={telefone}
-          onChange={useCallback(handlePhoneChange)}
+          onChange={handlePhoneChange}
         />
       </FormGroup>
 

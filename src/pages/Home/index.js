@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom/cjs/react-router-dom.min";
 import { useEffect, useState, useMemo } from "react";
 import ContactsService from "../../services/ContactsService";
+import APIError from "../../errors/APIError";
 
 import formatPhone from "../../utils/formatPhone";
 import {
@@ -31,7 +32,7 @@ export default function Home() {
         const contactsList = await ContactsService.listContacts(orderBy);
         setContacts(contactsList);
       } catch (error) {
-        console.log("error", error);
+        console.log("Catch Error: ", error);
       } finally {
         setIsLoading(false);
       }

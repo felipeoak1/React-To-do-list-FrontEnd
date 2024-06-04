@@ -4,12 +4,6 @@ export default function useErrors() {
   const [errors, setErrors] = useState([]);
 
   function setError({ field, message }) {
-    const errorEmailAlreadyExists = errors.find((error) => error.field === field);
-
-    if (errorEmailAlreadyExists) {
-      return;
-    }
-
     setErrors((prevState) => [
       ...prevState,
       { field, message },

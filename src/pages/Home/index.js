@@ -1,14 +1,15 @@
-/* eslint-disable react/jsx-one-expression-per-line */
+/* eslint-disable no-nested-ternary */
 import { Link } from "react-router-dom/cjs/react-router-dom.min";
 import {
   useEffect, useState, useMemo, useCallback,
 } from "react";
-import ContactsService from "../../services/ContactsService";
-
-import formatPhone from "../../utils/formatPhone";
+import TasksServices from "../../services/TasksServices";
+import formatDate from "../../utils/formatDate";
 import {
   Container, InputSearchContainer, Header, ListHeader, Card, ErrorContainer, EmptyListContainer,
+  Info, TaskDescription, TaskName, Actions, TaskDate,
 } from "./styles";
+import Modal from "../../components/Modal";
 
 import arrow from "../../assets/images/icons/arrow.svg";
 import edit from "../../assets/images/icons/edit.svg";
@@ -20,24 +21,24 @@ import Loader from "../../components/Loader";
 import Button from "../../components/Button";
 
 export default function Home() {
-  const [contacts, setContacts] = useState([]);
+  const [tasks, setTasks] = useState([]);
   const [orderBy, setOrderBy] = useState("ASC");
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState(null);
 
-  // useMemo memoriza o retorno da função que foi passada.
-  const filteredContacts = useMemo(() => contacts.filter((contact) => (
-    contact.name.toLowerCase().includes(searchTerm.toLowerCase())
-  )), [contacts, searchTerm]);
+  const filteredTasks = useMemo(() => tasks.filter((task) => (
+    task.titulo.toLowerCase().includes(searchTerm.toLowerCase())
+  )), [tasks, searchTerm]);
 
-  // useCallback memoriza a função que foi passada.
-  const loadContacts = useCallback(async () => {
+  const loadTasks = useCallback(async () => {
     setIsLoading(true);
     try {
-      const contactsList = await ContactsService.listContacts(orderBy);
+      const tasksList = await TasksServices.listTasks(orderBy);
       setHasError(false);
-      setContacts(contactsList);
+      setTasks(tasksList);
     } catch {
       setHasError(true);
     } finally {
@@ -54,61 +55,79 @@ export default function Home() {
   }
 
   function handleTryAgain() {
-    loadContacts();
+    loadTasks();
   }
 
-  // useEffect não pode ser configurado como assíncrono. Race condition.
-  useEffect(() => {
-    loadContacts();
-    return () => console.log("Clean Up");
-  }, [loadContacts]);
+  function handleToggleDelete(task) {
+    setSelectedTask(task);
+    setIsModalOpen(true);
+  }
 
-  console.log("primeira renderização");
+  function handleModalClose(refresh = false) {
+    setIsModalOpen(false);
+    setSelectedTask(null);
+    if (refresh) {
+      loadTasks();
+    }
+  }
+
+  useEffect(() => {
+    loadTasks();
+  }, [loadTasks]);
 
   return (
-    <Container>
 
+    <Container>
       <Loader isLoading={isLoading} />
 
-      {(contacts.length > 0) && (
-      <InputSearchContainer>
-        <input
-          value={searchTerm}
-          type="text"
-          placeholder="Pesquisar contato..."
-          onChange={handleChangeSearchTerm}
+      {isModalOpen && selectedTask && (
+        <Modal
+          id={selectedTask.id}
+          danger
+          titulo={selectedTask.titulo}
+          descricao={selectedTask.descricao}
+          status={selectedTask.status}
+          onClose={() => handleModalClose(true)}
         />
-      </InputSearchContainer>
+      )}
+
+      {(tasks.length > 0) && (
+        <InputSearchContainer>
+          <input
+            value={searchTerm}
+            type="text"
+            placeholder="Pesquisar tarefa..."
+            onChange={handleChangeSearchTerm}
+          />
+        </InputSearchContainer>
       )}
 
       <Header
         justifyContent={
-          // eslint-disable-next-line no-nested-ternary
           (hasError
             ? "flex-end"
             : (
-              contacts.length > 0
+              tasks.length > 0
                 ? "space-between"
                 : "center"
             ))
         }
-
       >
-        {(!hasError && contacts.length > 0) && (
-        <strong>
-          {filteredContacts.length}
-          {" "}
-          {filteredContacts.length === 1 ? "contato" : "contatos"}
-        </strong>
+        {(!hasError && tasks.length > 0) && (
+          <strong>
+            {filteredTasks.length}
+            {" "}
+            {filteredTasks.length === 1 ? "Tarefa" : "Tarefas"}
+          </strong>
         )}
-        <Link to="/new">Novo Contato</Link>
+        {!hasError && <Link to="/new">Nova Tarefa</Link>}
       </Header>
 
       {hasError && (
         <ErrorContainer>
           <img src={sad} alt="Imagem de erro." />
           <div className="details">
-            <strong>Ocorreu um erro ao obter seus contatos!</strong>
+            <strong>Ocorreu um erro ao obter suas tarefas!</strong>
             <Button type="button" onClick={() => handleTryAgain()}>
               Tente novamente
             </Button>
@@ -118,51 +137,58 @@ export default function Home() {
 
       {!hasError && (
         <>
-          {(contacts.length < 1 && !isLoading) && (
+          {(tasks.length < 1 && !isLoading) && (
             <EmptyListContainer>
               <img src={emptyBox} alt="Empty box" />
-
               <p>
-                Você ainda não tem nenhum contato cadastrado!
-                Clique no botão <strong>”Novo contato”</strong> à cima para cadastrar o seu primeiro!
+                Você ainda não tem nenhuma tarefa cadastrada!
+                Clique no botão
+                {" "}
+                <strong>”Nova tarefa"</strong>
+                {" "}
+                à cima para cadastrar a sua primeira!
               </p>
             </EmptyListContainer>
           )}
 
-          {filteredContacts.length > 0 && (
-          <ListHeader orderBy={orderBy}>
-            <button type="button" onClick={handleToggleOrderBy}>
-              <span>Nome</span>
-              <img src={arrow} alt="arrow icon" />
-            </button>
-          </ListHeader>
+          {filteredTasks.length > 0 && (
+            <ListHeader orderBy={orderBy}>
+              <button type="button" onClick={handleToggleOrderBy}>
+                <span>Título</span>
+                <img src={arrow} alt="arrow icon" />
+              </button>
+            </ListHeader>
           )}
 
-          {filteredContacts.map((contact) => (
-            <Card key={contact.id}>
-              <div className="info">
-                <div className="contact-name">
-                  <strong>{contact.name}</strong>
-                  {contact.category_name
-                        && <small>{contact.category_name}</small>}
-                </div>
-                <span>{contact.email}</span>
-                <span>{formatPhone(contact.phone)}</span>
-              </div>
+          {filteredTasks.map((task) => (
+            <Card key={task.id}>
+              <Info>
+                <TaskName>
+                  <strong>{task.titulo}</strong>
+                  <small>{(task.status).charAt(0).toUpperCase() + task.status.slice(1)}</small>
+                </TaskName>
+                <TaskDescription>{task.descricao}</TaskDescription>
+                <TaskDate>
+                  Data criação:
+                  {formatDate(task.data)}
+                </TaskDate>
+              </Info>
 
-              <div className="actions">
-                <Link to={`/edit/${contact.id}`}>
+              <Actions>
+                <Link to={`/edit/${task.id}`}>
                   <img src={edit} alt="Edit" />
                 </Link>
-                <button type="button">
+                <button
+                  type="button"
+                  onClick={() => handleToggleDelete(task)}
+                >
                   <img src={trash} alt="Delete" />
                 </button>
-              </div>
+              </Actions>
             </Card>
           ))}
         </>
       )}
-
     </Container>
   );
 }

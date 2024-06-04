@@ -90,7 +90,7 @@ export const Card = styled.div`
   }
 
   .info{
-    .contact-name {
+    .task-name {
       display: flex;
       align-items: center;
 
@@ -107,9 +107,9 @@ export const Card = styled.div`
 
     span {
       display: block;
-      font-size: 14px;
-      color: ${({ theme }) => theme.colors.gray[200]}
-
+      font-size: 16px;
+      color: ${({ theme }) => theme.colors.primary.dark};
+      margin-bottom: 10px;
     }
   }
 
@@ -159,5 +159,81 @@ export const EmptyListContainer = styled.div`
     strong {
       color: ${({ theme }) => theme.colors.primary.main}
     }
+  }
+`;
+// styles.js
+
+export const CardContainer = styled.div`
+  background: white;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.04);
+  padding: 16px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  & + & {
+    margin-top: 16px;
+  }
+`;
+
+export const Info = styled.div`
+  .task-name {
+    display: flex;
+    align-items: center;
+
+    strong {
+      color: ${({ theme }) => theme.colors.primary.dark};
+      font-size: 18px;
+      margin-right: 8px;
+    }
+
+    small {
+      background-color: ${({ theme }) => theme.colors.primary.lighter};
+      color: ${({ theme }) => theme.colors.primary.main};
+      font-weight: bold;
+      text-transform: uppercase;
+      padding: 4px;
+      border-radius: 4px;
+    }
+  }
+`;
+
+export const TaskName = styled.div`
+  margin-bottom: 10px;
+  small {
+        background-color: ${({ theme }) => theme.colors.primary.main};
+        color: white;
+        font-weight: bold;
+        text-transform: capitalize;
+        padding: 4px;
+        border-radius: 4px;
+        margin-left: 8px;
+      }
+`;
+
+export const TaskDescription = styled.div`
+  font-size: 16px;
+  color: ${({ theme }) => theme.colors.primary.dark};
+  margin-bottom: 10px;
+`;
+
+export const TaskStatus = styled.div`
+  // Se precisar de estilos adicionais para o status
+`;
+
+export const TaskDate = styled.div`
+  font-size: 14px;
+  color: ${({ theme }) => theme.colors.gray};
+`;
+
+export const Actions = styled.div`
+  display: flex;
+  align-items: center;
+
+  button {
+    background: transparent;
+    border: none;
+    margin-left: 8px;
   }
 `;
